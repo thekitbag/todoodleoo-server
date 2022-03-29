@@ -11,7 +11,7 @@ from sqlalchemy import func
 @bp.route('/get_tasks', methods=['GET'])
 def get_tasks():
     project_id = request.args.get('project_id')
-    
+
     if project_id == None:
         return 'No project ID', 400
     project = Project.query.get(project_id)
@@ -21,13 +21,13 @@ def get_tasks():
     themes = db.session.query(Theme).filter(Theme.project_id==project_id).all()
     timeboxes = db.session.query(Timebox).filter(Timebox.project_id==project_id).filter(Timebox.status!='Closed').all()
     all_tasks = db.session.query(Task).filter(Task.project_id==project_id).all()
-    
+
     resp = {}
 
     response_builder.add_tasks_to_response(all_tasks, timeboxes, resp)
     response_builder.add_themes_to_response(themes, resp)
     response_builder.add_timeboxes_to_response(timeboxes, resp)
-    
+
     return resp, 200
 
 
@@ -41,7 +41,7 @@ def get_tasks_of_timebox():
     resp = {}
 
     response_builder.add_tasks_to_response(tasks, [timebox], resp)
-    
+
     return resp, 200
 
 
@@ -60,9 +60,9 @@ def add_task():
         tb = db.session.query(Timebox).filter(Timebox.project == project).filter(Timebox.title == 'Backlog').first()
     else:
         tb = db.session.query(Timebox).filter(Timebox.project == project).filter(Timebox.title == data['timebox']).first()
-    
+
     task = Task(title=data['title'], project=project, status='To Do')
-    
+
     task.add_to_timebox(tb)
     task.add(project)
     task.add_to_theme(project)
@@ -70,16 +70,18 @@ def add_task():
     resp = {}
 
     response_builder.add_tasks_to_response([task], [tb], resp)
-    
+
     return resp, 200
 
 
 @bp.route('/delete_task', methods=['POST'])
 def delete_task():
+    print(request)
+
     data = json.loads(request.data.decode('utf-8'))
     task = Task.query.get(data['task_id'])
     task.delete()
-    
+
     return 'Task deleted', 200
 
 
@@ -112,7 +114,7 @@ def update_task_status():
     target_status = data['target_status']
 
     task.update_status(target_status)
-    
+
     return 'Task Updated', 200
 
 
@@ -126,7 +128,7 @@ def update_task_theme():
         abort(400)
 
     task.update_theme(theme)
-    
+
     return 'Theme updated', 200
 
 

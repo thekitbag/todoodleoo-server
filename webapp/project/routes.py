@@ -39,5 +39,3 @@ def get_projects():
         return resp
     else:
         return 'Not Authorised', 401
-
-
