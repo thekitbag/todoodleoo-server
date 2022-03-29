@@ -151,5 +151,8 @@ class Project(db.Model):
     def __repr__(self):
         return f'<Project {self.id}  {self.title}>'
 
+class Subtask(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
 
-
+    def __repr__(self):
+        return f'<Subtask {self.id}>'
