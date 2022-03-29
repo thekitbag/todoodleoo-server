@@ -7,6 +7,8 @@ if os.environ['FLASK_ENV'] == 'development':
     app = create_app(Config)
 elif os.environ['FLASK_ENV'] == 'prod':
     app = create_app(Config)
+elif os.environ['FLASK_ENV'] == 'staging':
+    app = create_app(Config)
 else:
     print('ENV NOT SET TO dev, staging or prod')
 
@@ -14,5 +16,3 @@ else:
 @app.shell_context_processor
 def make_shell_context():
     return {'db': db, 'Task': Task, 'StatusUpdate': StatusUpdate, 'Theme': Theme, 'Timebox': Timebox, 'Project': Project}
-
-
