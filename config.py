@@ -16,7 +16,6 @@ class TestConfig(Config):
 
 class StagingConfig(Config):
     CORS_ALLOW_ORIGIN='https://todoodleoo-client.herokuapp.com'
-    SESSION_COOKIE_DOMAIN='https://todoodleoo-client.herokuapp.com'
 
 class DevelopmentConfig(Config):
     CORS_ALLOW_ORIGIN='http://localhost:3000'
