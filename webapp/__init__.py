@@ -29,9 +29,7 @@ def create_app(config_class=Config):
     origins=app.config['CORS_ALLOW_ORIGIN'], # the domains allowed to access the server
     cors_headers=app.config['CORS_HEADERS'],
     supports_credentials=app.config['CORS_SUPPORTS_CREDENTIALS'], # True
-    headers=['Content-Type'],
-    expose_headers=['Access-Control-Allow-Origin'])
-
+    headers=['Content-Type'])
     print(app.config)
 
 
