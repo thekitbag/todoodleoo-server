@@ -27,7 +27,11 @@ def create_app(config_class=Config):
 
     CORS(app,
     origins=app.config['CORS_ALLOW_ORIGIN'], # the domains allowed to access the server
-    supports_credentials=app.config['CORS_SUPPORTS_CREDENTIALS']) # True
+    cors_headers=app.config['CORS_HEADERS'],
+    supports_credentials=app.config['CORS_SUPPORTS_CREDENTIALS'], # True
+    headers=['Content-Type'],
+    expose_headers=['Access-Control-Allow-Origin'])
+
 
 
     from webapp.task import bp as task_bp
@@ -47,6 +51,7 @@ def create_app(config_class=Config):
 
     from webapp.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
+
 
     return app
 

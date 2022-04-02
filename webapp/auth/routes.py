@@ -1,19 +1,24 @@
-from flask import request, json, session, jsonify
+from flask import request, json, session, jsonify, make_response
 from flask_login import current_user, login_user, logout_user
+from flask_cors import cross_origin
 from webapp.auth import bp
 from webapp.models import User
 from webapp import db
 
-@bp.route('/me', methods=['GET'])
+
+@bp.route('/me', methods=['GET', 'POST'])
+@cross_origin(methods=['POST'], supports_credentials=True, headers=['Content-Type', 'Authorization'], origin='http://127.0.0.1:5500')
 def me():
 	if current_user.is_authenticated:
 		userdata = {'username': current_user.username, 'user_id': current_user.id}
 		return userdata, 200
 	else:
-		return 'Not Logged in', 401
+		userdata = {'username': '', 'user_id': -1}
+		return userdata, 200
 
 @bp.route('/login', methods=['POST'])
 def login():
+
 	if current_user.is_authenticated:
 		return 'Already logged in', 409
 
@@ -28,6 +33,8 @@ def login():
 
 	login_user(user)
 	userdata = {'username': current_user.username, 'user_id': current_user.id}
+	resp = make_response(userdata)
+	resp.set_cookie('same-site-cookie', 'localhost', samesite='None');
 	return userdata, 200
 
 @bp.route('/register', methods=['POST'])
@@ -44,7 +51,7 @@ def register():
 	userdata = {'username': username, 'user_id': user.id}
 	return userdata, 200
 
-@bp.route('/logout', methods=['POST'])
+@bp.route('/logout', methods=['POST', 'GET'])
 def logout():
 	logout_user()
 	return 'Logged out', 200
