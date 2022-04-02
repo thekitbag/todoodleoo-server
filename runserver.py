@@ -1,14 +1,14 @@
 import os
 from webapp import create_app, db
 from webapp.models import Task, StatusUpdate, Theme, Timebox, Project
-from config import Config
+from config import Config, TestConfig, StagingConfig, DevelopmentConfig
 
 if os.environ['FLASK_ENV'] == 'development':
-    app = create_app(Config)
+    app = create_app(DevelopmentConfig)
 elif os.environ['FLASK_ENV'] == 'prod':
     app = create_app(Config)
 elif os.environ['FLASK_ENV'] == 'staging':
-    app = create_app(Config)
+    app = create_app(StagingConfig)
 else:
     print('ENV NOT SET TO dev, staging or prod')
 

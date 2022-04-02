@@ -32,6 +32,8 @@ def create_app(config_class=Config):
     headers=['Content-Type'],
     expose_headers=['Access-Control-Allow-Origin'])
 
+    print(app.config)
+
 
 
     from webapp.task import bp as task_bp
