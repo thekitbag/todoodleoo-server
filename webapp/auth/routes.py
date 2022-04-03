@@ -39,8 +39,7 @@ def login():
 	login_user(user)
 	userdata = {'username': current_user.username, 'user_id': current_user.id}
 	resp = make_response(userdata)
-	resp.set_cookie('same-site-cookie', 'localhost', samesite='None');
-	return userdata, 200
+	return resp, 200
 
 @bp.route('/register', methods=['POST'])
 def register():
