@@ -16,6 +16,11 @@ def me():
 		userdata = {'username': '', 'user_id': -1}
 		return userdata, 200
 
+@bp.route('/test', methods=['GET', 'POST'])
+def test():
+	print(request.headers)
+	return {'authenticated:': current_user.is_authenticated}
+
 @bp.route('/login', methods=['POST'])
 def login():
 
