@@ -16,7 +16,7 @@ class TestConfig(Config):
     TESTING = True
 
 class StagingConfig(Config):
-    SERVER_NAME = 'https://www.google.com'
+    SERVER_NAME = 'https://todoodleoo-client.herokuapp.com'
     CORS_ALLOW_ORIGIN='https://todoodleoo-client.herokuapp.com'
     #SESSION_COOKIE_DOMAIN = 'https://www.google.com'
 
