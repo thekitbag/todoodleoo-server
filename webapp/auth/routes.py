@@ -1,13 +1,11 @@
 from flask import request, json, session, jsonify, make_response
 from flask_login import current_user, login_user, logout_user
-from flask_cors import cross_origin
 from webapp.auth import bp
 from webapp.models import User
 from webapp import db
 
 
 @bp.route('/me', methods=['GET', 'POST'])
-@cross_origin(methods=['POST'], supports_credentials=True, headers=['Content-Type', 'Authorization'], origin='http://127.0.0.1:5500')
 def me():
 	if current_user.is_authenticated:
 		userdata = {'username': current_user.username, 'user_id': current_user.id}
@@ -39,6 +37,7 @@ def login():
 	login_user(user)
 	userdata = {'username': current_user.username, 'user_id': current_user.id}
 	resp = make_response(userdata)
+	print(request.cookies.get("sessionToken"))
 	return resp, 200
 
 @bp.route('/register', methods=['POST'])

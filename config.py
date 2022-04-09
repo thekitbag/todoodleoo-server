@@ -6,9 +6,6 @@ class Config(object):
         'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY= 'top secretXXX' #change this on prod!
-    CORS_SUPPORTS_CREDENTIALS = True
-    CORS_HEADERS = 'Content-Type'
-    SESSION_REFRESH_EACH_REQUEST: False
 
 
 class TestConfig(Config):
@@ -16,9 +13,8 @@ class TestConfig(Config):
     TESTING = True
 
 class StagingConfig(Config):
-    SERVER_NAME = 'todoodleoo-client.herokuapp.com'
-    CORS_ALLOW_ORIGIN='https://todoodleoo-client.herokuapp.com'
+    TESTING = False
     #SESSION_COOKIE_DOMAIN = 'https://www.google.com'
 
 class DevelopmentConfig(Config):
-    CORS_ALLOW_ORIGIN='http://localhost:3000'
+    APPLICATION_ROOT = '/api'
