@@ -139,9 +139,8 @@ def edit_task():
     task = Task.query.get(data['id'])
     title = data['title']
     priority = data['priority']
-    timebox = data['timebox']
     theme = db.session.query(Theme).filter(Theme.title==data['theme']).first()
 
-    task.edit_task(title, priority, theme, timebox)
+    task.edit_task(title, priority, theme)
 
     return 'success', 200

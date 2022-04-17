@@ -32,7 +32,7 @@ def login():
 	user = User.query.filter_by(username=username).first()
 
 	if user is None or not user.check_password(password):
-			return "Login Failed", 401
+			return "Incorrect username/password combo", 200
 
 	login_user(user)
 	userdata = {'username': current_user.username, 'user_id': current_user.id}

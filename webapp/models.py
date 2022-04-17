@@ -84,12 +84,7 @@ class Task(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def edit_task(self, title, priority, theme, timebox):
-
-        if timebox != []:
-            timebox = db.session.query(Timebox).filter(Timebox.title==timebox).first()
-            self.add_to_timebox(timebox)
-
+    def edit_task(self, title, priority, theme):
         self.title = title
         self.priority = priority
         self.theme = theme

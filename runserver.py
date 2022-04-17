@@ -2,6 +2,9 @@ import os
 from webapp import create_app, db
 from webapp.models import Task, StatusUpdate, Theme, Timebox, Project
 from config import Config, TestConfig, StagingConfig, DevelopmentConfig
+from dotenv import load_dotenv
+
+load_dotenv()
 
 if os.environ['FLASK_ENV'] == 'development':
     app = create_app(DevelopmentConfig)
