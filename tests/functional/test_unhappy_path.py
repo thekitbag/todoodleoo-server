@@ -210,14 +210,16 @@ def test_add_task_to_timebox_in_different_project(logged_in_client):
 	'project_id': project_id_1,
 	'title': 'test timebox 1',
 	'start_time': datetime.now(),
-	'end_time': datetime.now() + timedelta(days=1)
+	'end_time': datetime.now() + timedelta(days=1),
+	'goals': []
 	}
 	r4 = logged_in_client.post('/add_timebox', json=timebox1_data)
 	timebox2_data = {
 	'project_id': project_id_2,
 	'title': 'test timebox 2',
 	'start_time': datetime.now(),
-	'end_time': datetime.now() + timedelta(days=1)
+	'end_time': datetime.now() + timedelta(days=1),
+	'goals': []
 	}
 	r5 = logged_in_client.post('/add_timebox', json=timebox1_data)
 	r6 = logged_in_client.post('/add_task', json={'project_id': project_id_1, 'title': 'test task 1'})
@@ -264,5 +266,36 @@ def test_timebox_shortcut_invalid_shortcut_id(logged_in_client):
 	r2 = logged_in_client.post('/timebox_shortcuts', json={'project_id': project_id, 'timebox_id': 'banana'})
 	assert r2.status_code == 400
 
+def test_edit_timebox_no_project_id(logged_in_client):
+	"""
+	GIVEN a project with a timebox
+	WHEN edit timebox is called with no project_id
+	THEN a 400 is returned
+	"""
+	data = {
+	'timebox_id': 1,
+	'title': 'To do before end of the week',
+	'goals': ['feel better', 'sleep more', 'dont drink']
+	}
+	r = logged_in_client.post('/edit_timebox', json=data)
+	assert r.status_code == 400
 
+def test_edit_timebox_incorrect_project_id(logged_in_client, sample_data):
+	"""
+	GIVEN a project with a timebox
+	WHEN edit timebox is called with a project_id that doesn't match
+	THEN a 401 is returned
+	"""
 
+	r = logged_in_client.get(f"/get_tasks?project_id={1}")
+	r_body = r.json
+
+	print(r_body)
+	data = {
+	'project_id': 2,
+	'timebox_id': 1,
+	'title': 'To do before end of the week',
+	'goals': ['feel better', 'sleep more', 'dont drink']
+	}
+	r = logged_in_client.post('/edit_timebox', json=data)
+	assert r.status_code == 401

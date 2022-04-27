@@ -5,7 +5,7 @@ def test_get_projects_new_app(logged_in_client):
 	Given a fresh instance of the app
 	When the get_boards route is called
 	Then the response is valid, content type is JSON and all fields are there but empty
-	""" 
+	"""
 	with logged_in_client as c:
 		response = logged_in_client.get('/get_projects')
 		assert response.status_code == 200
@@ -61,12 +61,12 @@ def test_get_tasks_existing_data(sample_data, test_client):
 	tasks = response_body['tasks']
 	themes = response_body['themes']
 	timeboxes = response_body['timeboxes']
-	assert tasks[0] == {'id': 1, 
-	'priority': 0, 
-	'status': 'To Do', 
-	'theme': 'No Theme', 
-	'theme_color': None, 
-	'timebox': 'Backlog', 
+	assert tasks[0] == {'id': 1,
+	'priority': 0,
+	'status': 'To Do',
+	'theme': 'No Theme',
+	'theme_color': None,
+	'timebox': 'Backlog',
 	'title': 'test task A'
 	}
 
@@ -114,7 +114,8 @@ def test_add_timebox(test_client, sample_data):
 	'project_id': 1,
 	'title': 'test timebox abc',
 	'start_time': datetime.now(),
-	'end_time': datetime.now() + timedelta(days=1)
+	'end_time': datetime.now() + timedelta(days=1),
+	'goals': ['do X', 'Do Y']
 	}
 	r = test_client.post('/add_timebox', json=timebox_data)
 	r2 = test_client.get(f'/get_tasks?project_id={1}')
@@ -138,7 +139,7 @@ def test_add_project_existing(sample_data, logged_in_client):
 def test_delete_task(sample_data, test_client):
 	"""
 	GIVEN some test data
-	WHEN delete task is called 
+	WHEN delete task is called
 	THEN task should be deleted from the test data
 	"""
 	r = test_client.get('get_tasks?project_id=2')
@@ -234,7 +235,7 @@ def test_add_task_to_theme(logged_in_client, sample_data):
 
 def test_delete_theme(logged_in_client, sample_data):
 	"""
-	GIVEN a theme with tasks 
+	GIVEN a theme with tasks
 	WHEN that theme is deleted
 	THEN theme should not exist, tasks within it should go back to no theme, and get tasks
 	should return a 200"""
@@ -256,7 +257,31 @@ def test_delete_theme(logged_in_client, sample_data):
 	tasks = r4_body['tasks']
 	themes = r4_body['themes']
 	assert th['title'] not in [theme['title'] for theme in themes]
-	assert [task for task in tasks if task['theme'] == th] == [] 
+	assert [task for task in tasks if task['theme'] == th] == []
+
+def test_edit_timebox(logged_in_client, sample_data):
+	"""
+	GIVEN some test data
+	WHEN the timebox title and goals is edited
+	THEN response should be a 200 and data should be stored and retrieved on next called
+	"""
+	r = logged_in_client.get(f"/get_tasks?project_id={2}")
+	r_body = r.json
+	assert r_body['timeboxes'][1]['title'] == 'To Do This Week'
+	assert r_body['timeboxes'][1]['goals'] == ['feel good']
+	data = {
+	'project_id': 2,
+	'timebox_id': r_body['timeboxes'][1]['id'],
+	'title': 'To do before end of the week',
+	'goals': ['feel better', 'sleep more', 'dont drink']
+	}
+	r2 = logged_in_client.post('/edit_timebox', json=data)
+	assert r2.status_code == 200
+	r3 = logged_in_client.get(f"/get_tasks?project_id={2}")
+	r3_body = r3.json
+	assert r3_body['timeboxes'][1]['title'] == 'To do before end of the week'
+	assert r3_body['timeboxes'][1]['goals'] == ['feel better', 'sleep more', 'dont drink']
+
 
 
 

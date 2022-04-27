@@ -1,4 +1,4 @@
-import pytest 
+import pytest
 import config
 import random
 from datetime import datetime
@@ -10,22 +10,22 @@ from webapp.models import Theme, Timebox, Task, Project
 
 @pytest.fixture(scope='function')
 def logged_in_client(database, app):
- 
+
     # Flask provides a way to test your application by exposing the Werkzeug test Client
     # and handling the context locals for you.
     testing_client = app.test_client()
- 
+
     # Establish an application context before running the tests.
     ctx = app.app_context()
     ctx.push()
 
-    r = testing_client.post('/auth/register',
+    r = testing_client.post('/register',
                                     json=dict(username='mark', password='Password1'))
-    r2 = testing_client.post('/auth/login',
+    r2 = testing_client.post('/login',
                                     json=dict(username='mark', password='Password1'))
- 
+
     yield testing_client  # this is where the testing happens!
- 
+
     ctx.pop()
 
 
@@ -51,17 +51,17 @@ def database(app):
 
 @pytest.fixture(scope='function')
 def test_client(database, app):
- 
+
     # Flask provides a way to test your application by exposing the Werkzeug test Client
     # and handling the context locals for you.
     testing_client = app.test_client()
- 
+
     # Establish an application context before running the tests.
     ctx = app.app_context()
     ctx.push()
- 
+
     yield testing_client  # this is where the testing happens!
- 
+
     ctx.pop()
 
 
@@ -85,8 +85,8 @@ def sample_data(database, logged_in_client):
     logged_in_client.post('/add_theme', json={'project_id': p2.id, 'title': 'test theme 21'})
     logged_in_client.post('/add_theme', json={'project_id': p2.id, 'title': 'test theme 22'})
 
-    logged_in_client.post('add_timebox', json={'project_id': p1.id, 'title': 'To Do This Week'})
-    logged_in_client.post('add_timebox', json={'project_id': p2.id, 'title': 'To Do This Week'})
+    logged_in_client.post('add_timebox', json={'project_id': p1.id, 'title': 'To Do This Week', 'goals': []})
+    logged_in_client.post('add_timebox', json={'project_id': p2.id, 'title': 'To Do This Week', 'goals': ['feel good']})
 
     logged_in_client.post('add_task', json={'project_id': p1.id, 'title': 'test task A'})
     logged_in_client.post('add_task', json={'project_id': p1.id, 'title': 'test task B'})
@@ -96,7 +96,7 @@ def sample_data(database, logged_in_client):
     logged_in_client.post('add_task', json={'project_id': p2.id, 'title': 'test task F'})
     logged_in_client.post('add_task', json={'project_id': p2.id, 'title': 'test task G'})
     logged_in_client.post('add_task', json={'project_id': p2.id, 'title': 'test task H'})
-    
+
 @pytest.fixture(scope='function')
 def random_data(database):
     statuses = ['To Do', 'In Progress', 'Done']
@@ -117,13 +117,13 @@ def random_data(database):
         backlog = Timebox(project=p, title='Backlog', status='To Do')
         timeboxes.append(backlog)
         if random.randint(0,10) % 2 == 0:
-            tb = Timebox(project=p, title='To do before ' + random.choice(events), 
+            tb = Timebox(project=p, title='To do before ' + random.choice(events),
                 status=random.choice(['To Do', 'In Progress', 'Closed']))
             timeboxes.append(tb)
         for i in p.timeboxes.all():
             for j in range(1,10):
-                t = Task(project=p, 
-                    theme=random.choice(p.themes.all()), 
+                t = Task(project=p,
+                    theme=random.choice(p.themes.all()),
                     title=random.choice(verbs) + ' ' + random.choice(nouns),
                     status=random.choice(statuses),
                     priority=j
@@ -145,5 +145,3 @@ def random_data(database):
     }
 
     return data
-
-

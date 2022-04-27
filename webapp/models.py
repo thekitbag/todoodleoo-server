@@ -124,6 +124,16 @@ class Timebox(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def delete(self):
+        """deletes the timebox and returns all not done tasks
+        to the backlog"""
+        backlog = db.session.query(Timebox).filter(Timebox.title=='Backlog').filter(Timebox.project_id==self.project_id).first()
+        for task in self.tasks.all():
+            if task.status != 'Done':
+                task.add_to_timebox(backlog)
+        db.session.delete(self)
+        db.session.commit()
+
     def __repr__(self):
         return f'<Timebox {self.id}>'
 

@@ -15,7 +15,6 @@ def add_timebox():
     project = Project.query.get(data['project_id'])
     title=data['title']
     goals=[goal for goal in data['goals'] if goal != None]
-    print('goals:',goals)
     timebox = Timebox(title=title, project=project, status='To Do')
     timebox.add_goals(goals)
     db.session.add(timebox)
@@ -25,15 +24,16 @@ def add_timebox():
 @bp.route('/delete_timebox', methods=['POST'])
 def delete_timebox():
     data = json.loads(request.data.decode('utf-8'))
+
+    if 'project_id' not in data:
+        return 'No Project Id', 400
+    if 'timebox_id' not in data:
+        return 'No timebox ID', 400
+
+    data = json.loads(request.data.decode('utf-8'))
     timebox = Timebox.query.get(data['timebox_id'])
-    db.session.delete(timebox)
-    db.session.commit()
-    timeboxes = db.session.query(Timebox).filter(Timebox.project_id==data['project_id']).all()
-    resp = {}
-    resp['timeboxes'] = [{'id': timebox.id, 
-                    'title': timebox.title
-                    } for timebox in timeboxes]
-    return resp
+    timebox.delete()
+    return 'success', 200
 
 @bp.route('/update_timebox_status', methods=['POST'])
 def update_timebox_status():
@@ -57,3 +57,43 @@ def timebox_shortcut():
     db.session.commit()
     return {'id': timebox.id, 'title': timebox.title, 'start_time': timebox.start_time, 'end_time': timebox.end_time}
 
+@bp.route('/edit_timebox', methods=['POST'])
+def edit_timebox():
+    data = json.loads(request.data.decode('utf-8'))
+
+    if 'project_id' not in data:
+        return 'Request does not contain project ID', 400
+
+    if 'timebox_id' not in data:
+        return 'Request does not contain timebox ID', 400
+
+    if 'title' not in data:
+        return 'Request does not contain timebox title', 400
+
+    if 'goals' not in data:
+        return 'Request does not contain any goals', 400
+
+    project = Project.query.get(data['project_id'])
+    timebox = Timebox.query.get(data['timebox_id'])
+
+    if timebox and project:
+
+        if timebox.project_id != project.id:
+            return 'Timebox and project ID mismatch', 401
+
+        title=data['title']
+        goals=[goal for goal in data['goals'] if goal != None]
+
+        timebox.title = title
+        timebox.goals = []
+        timebox.add_goals(goals)
+
+        db.session.add(timebox)
+        db.session.commit()
+
+    else:
+        return 'Project or timebox not found', 404
+
+    return 'Timebox updted', 200
+
+    return data, 200

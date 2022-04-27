@@ -11,6 +11,8 @@ class Config(object):
 class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql:///tdtest'
     TESTING = True
+    SECRET_KEY = 'supersecurepw4testing!'
+
 
 class StagingConfig(Config):
     TESTING = False

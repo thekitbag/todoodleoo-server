@@ -26,7 +26,6 @@ def add_project():
     projects = current_user.projects.all()
     resp = {}
     resp['projects'] = [{'project_id': project.id, 'project_title': project.title} for project in projects]
-
     return jsonify(resp)
 
 
