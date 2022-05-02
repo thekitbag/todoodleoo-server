@@ -76,7 +76,6 @@ def add_task():
 
 @bp.route('/delete_task', methods=['POST'])
 def delete_task():
-    print(request)
 
     data = json.loads(request.data.decode('utf-8'))
     task = Task.query.get(data['task_id'])

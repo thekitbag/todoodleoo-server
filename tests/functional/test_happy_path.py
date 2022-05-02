@@ -184,8 +184,6 @@ def test_update_task_priority(random_data, test_client):
 	r2_body = r2.json
 	r3 = test_client.get('/get_tasks?project_id=1')
 	r3_body = r3.json
-	print(t['id'])
-	print(r3_body)
 	task = [task for task in r3_body['tasks'] if task['id'] == t['id']][0]
 	assert task['priority'] <  t['priority']
 
@@ -281,6 +279,46 @@ def test_edit_timebox(logged_in_client, sample_data):
 	r3_body = r3.json
 	assert r3_body['timeboxes'][1]['title'] == 'To do before end of the week'
 	assert r3_body['timeboxes'][1]['goals'] == ['feel better', 'sleep more', 'dont drink']
+
+def test_close_timebox(logged_in_client, random_data, models):
+	"""
+	GIVEN a project with timeboxes and done get_tasks
+	WHEN close timebox is called
+	THEN timebox status is changed to closed and all non-done tasks are returned to Backlog
+	"""
+	r = logged_in_client.get(f"/get_tasks?project_id={1}")
+	b = r.json
+	tb = b['timeboxes'][1]
+	tasks = [task for task in b['tasks'] if task['timebox'] == tb['title']]
+	done_tasks = [task for task in tasks if task['status'] == 'Done' ]
+	non_done_tasks = [task for task in tasks if task['status'] != 'Done' ]
+	assert tb['status'] != 'Closed'
+
+	data = {
+	'project_id': 1,
+	'timebox_id': tb['id'],
+	'status': 'Closed'
+	}
+
+	r2 = logged_in_client.post('/update_timebox_status', json=data)
+	assert r2.status_code == 200
+
+	tb_model = models['timebox']
+	target_tb = tb_model.query.get(tb['id'])
+
+	assert target_tb.title == tb['title']
+	tasks2 = target_tb.tasks.all()
+	ids = [task.id for task in tasks2]
+	assert target_tb.status == 'Closed'
+	assert ids == [t['id'] for t in done_tasks]
+
+	r3 = logged_in_client.get(f"/get_tasks?project_id={1}")
+	b3 = r3.json
+	backlog = [task for task in b3['tasks'] if task['timebox'] == 'Backlog']
+
+	for task in non_done_tasks:
+		assert task['id'] in [t['id'] for t in backlog ]
+
 
 
 

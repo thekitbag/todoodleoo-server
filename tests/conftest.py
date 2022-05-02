@@ -7,6 +7,9 @@ from webapp import create_app, db
 from flask import current_app
 from webapp.models import Theme, Timebox, Task, Project
 
+@pytest.fixture(scope='function')
+def models():
+    return {'timebox': Timebox}
 
 @pytest.fixture(scope='function')
 def logged_in_client(database, app):
@@ -116,7 +119,7 @@ def random_data(database):
             themes.append(th)
         backlog = Timebox(project=p, title='Backlog', status='To Do')
         timeboxes.append(backlog)
-        if random.randint(0,10) % 2 == 0:
+        for i in range(1,3):
             tb = Timebox(project=p, title='To do before ' + random.choice(events),
                 status=random.choice(['To Do', 'In Progress', 'Closed']))
             timeboxes.append(tb)

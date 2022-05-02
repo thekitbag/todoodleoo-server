@@ -19,7 +19,7 @@ def test_new_task(project):
 	t = Task(title='Test Task', project=project)
 	assert t.title == 'Test Task'
 	assert t. project == project
-	assert t in project.tasks	
+	assert t in project.tasks
 
 def test_new_theme(project):
 	"""
@@ -29,7 +29,7 @@ def test_new_theme(project):
 	"""
 	th = Theme(title='Test Theme', project=project)
 	assert th.title == 'Test Theme'
-	assert th.project == project 
+	assert th.project == project
 	assert th in project.themes
 
 def test_new_timebox(project):
@@ -81,5 +81,20 @@ def test_user():
 	assert u.check_password('password2') == False
 	assert u.check_password('password1') == True
 
-
-	
+def test_timebox_change_status_to_closed(random_data):
+	"""
+	GIVEN a timebox with tasks in different statuses
+	WHEN change status method is called
+	THEN the timebox status is changed and all non-done tasks are returned to the backlog
+	"""
+	p = random_data['projects'][0]
+	tb = p.timeboxes.all()[1]
+	tasks = tb.tasks.all()
+	non_done_tasks = [t for t in tasks if t.status != 'Done']
+	tb.change_status('Closed')
+	tasks2 = tb.tasks.all()
+	backlog = p.timeboxes.all()[0]
+	assert tb.status == 'Closed'
+	assert set([t.status for t in tasks2]) == {'Done'}
+	for task in non_done_tasks:
+		assert task in backlog.tasks.all()

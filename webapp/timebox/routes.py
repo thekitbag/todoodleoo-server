@@ -38,11 +38,17 @@ def delete_timebox():
 @bp.route('/update_timebox_status', methods=['POST'])
 def update_timebox_status():
     data = json.loads(request.data.decode('utf-8'))
+
+    if 'project_id' not in data:
+        return 'No Project Id', 400
+    if 'timebox_id' not in data:
+        return 'No timebox ID', 400
+    if data['status'] not in ['To Do', 'In Progress', 'Closed']:
+        return 'Invalid status', 400
+
     timebox = Timebox.query.get(data['timebox_id'])
-    timebox.status = data['status']
-    db.session.add(timebox)
-    db.session.commit()
-    return 'success', 200
+    timebox.change_status(data['status'])
+    return f'Timebox status changed to to {data["status"]}', 200
 
 @bp.route('/timebox_shortcuts', methods=['POST'])
 def timebox_shortcut():

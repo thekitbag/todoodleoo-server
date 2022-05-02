@@ -9,30 +9,40 @@ from webapp.main.helpers import insert_task_at_priority, prioritise_tasks
 def load_user(id):
     return User.query.get(int(id))
 
-class User(UserMixin, db.Model):
+class Goal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.Text, unique=True)
-    password = db.Column(db.Text)
-    roles = db.Column(db.Text)
-    is_active = db.Column(db.Boolean, default=True, server_default='true')
-    projects = db.relationship('Project', backref='user', lazy='dynamic')
-
-    def set_password(self, password):
-        self.password = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
-
-
-class Theme(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
-    title = db.Column(db.String(64))
-    color = db.Column(db.String(24))
-    tasks = db.relationship('Task', backref='theme', lazy='dynamic')
+    title = db.Column(db.String(128))
+    timebox_id = db.Column(db.Integer, db.ForeignKey('timebox.id'))
 
     def __repr__(self):
-        return f'<Theme {self.id}>'
+        return f'<Goal {self.id}>'
+
+class Project(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    title = db.Column(db.String(32))
+    tasks = db.relationship('Task', backref='project', lazy='dynamic')
+    themes = db.relationship('Theme', backref='project', lazy='dynamic')
+    timeboxes = db.relationship('Timebox', backref='project', lazy='dynamic')
+
+    def __repr__(self):
+        return f'<Project {self.id}  {self.title}>'
+
+class StatusUpdate(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
+    from_status = db.Column(db.String(32))
+    to_status = db.Column(db.String(32))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Status Update {self.id}>'
+
+class Subtask(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    def __repr__(self):
+        return f'<Subtask {self.id}>'
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -91,19 +101,18 @@ class Task(db.Model):
         db.session.add(self)
         db.session.commit()
 
-
     def __repr__(self):
         return f'<Task {self.id}>'
 
-class StatusUpdate(db.Model):
+class Theme(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
-    from_status = db.Column(db.String(32))
-    to_status = db.Column(db.String(32))
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    title = db.Column(db.String(64))
+    color = db.Column(db.String(24))
+    tasks = db.relationship('Task', backref='theme', lazy='dynamic')
 
     def __repr__(self):
-        return f'<Status Update {self.id}>'
+        return f'<Theme {self.id}>'
 
 class Timebox(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -116,7 +125,6 @@ class Timebox(db.Model):
     goals = db.relationship('Goal', backref='timebox', lazy='dynamic')
 
     def add_goals(self, goals):
-        print(goals)
         for goal in goals:
             g = Goal(title=goal)
             db.session.add(g)
@@ -134,30 +142,33 @@ class Timebox(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def change_status(self, target_status):
+        """
+        changes the timebox to the desired status
+        if the target status is Done then all non-done tasks in the timebox
+        will be returned to the Backlog
+        """
+        backlog = db.session.query(Timebox).filter(Timebox.title=='Backlog').filter(Timebox.project_id==self.project_id).first()
+        for task in self.tasks.all():
+            if task.status != 'Done':
+                task.add_to_timebox(backlog)
+        self.status = target_status
+        db.session.add(self)
+        db.session.commit()
+
     def __repr__(self):
         return f'<Timebox {self.id}>'
 
-class Goal(db.Model):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(128))
-    timebox_id = db.Column(db.Integer, db.ForeignKey('timebox.id'))
+    username = db.Column(db.Text, unique=True)
+    password = db.Column(db.Text)
+    roles = db.Column(db.Text)
+    is_active = db.Column(db.Boolean, default=True, server_default='true')
+    projects = db.relationship('Project', backref='user', lazy='dynamic')
 
-    def __repr__(self):
-        return f'<Goal {self.id}>'
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
 
-class Project(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    title = db.Column(db.String(32))
-    tasks = db.relationship('Task', backref='project', lazy='dynamic')
-    themes = db.relationship('Theme', backref='project', lazy='dynamic')
-    timeboxes = db.relationship('Timebox', backref='project', lazy='dynamic')
-
-    def __repr__(self):
-        return f'<Project {self.id}  {self.title}>'
-
-class Subtask(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
-    def __repr__(self):
-        return f'<Subtask {self.id}>'
+    def check_password(self, password):
+        return check_password_hash(self.password, password)

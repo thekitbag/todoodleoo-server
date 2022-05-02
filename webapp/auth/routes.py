@@ -16,7 +16,6 @@ def me():
 
 @bp.route('/test', methods=['GET', 'POST'])
 def test():
-	print(request.headers)
 	return {'authenticated:': current_user.is_authenticated}
 
 @bp.route('/login', methods=['POST'])

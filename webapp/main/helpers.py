@@ -39,6 +39,5 @@ def insert_task_at_priority(task, priority, tasks):
         elif i.priority >= priority:
             if i .priority <= task.priority:
                 i.priority += 1
-    print('tasks', tasks, '\n')
 
     return tasks
