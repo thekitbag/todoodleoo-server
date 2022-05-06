@@ -299,3 +299,12 @@ def test_edit_timebox_incorrect_project_id(logged_in_client, sample_data):
 	}
 	r = logged_in_client.post('/edit_timebox', json=data)
 	assert r.status_code == 401
+
+def test_close_timebox_missing_data(logged_in_client, sample_data):
+	assert 0 == 1
+
+def test_close_timebox_incorrect_project_id(logged_in_client, sample_data):
+	assert 0 == 1
+
+def test_add_subtask_missing_data(logged_in_client, sample_data):
+	assert 0 == 1

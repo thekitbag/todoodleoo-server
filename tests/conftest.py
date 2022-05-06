@@ -100,6 +100,8 @@ def sample_data(database, logged_in_client):
     logged_in_client.post('add_task', json={'project_id': p2.id, 'title': 'test task G'})
     logged_in_client.post('add_task', json={'project_id': p2.id, 'title': 'test task H'})
 
+    logged_in_client.post('add_subtask', json={'project_id': p1.id, 'task_id':2, 'title': 'test subtask 1'})
+
 @pytest.fixture(scope='function')
 def random_data(database):
     statuses = ['To Do', 'In Progress', 'Done']

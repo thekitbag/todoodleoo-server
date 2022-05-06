@@ -319,6 +319,40 @@ def test_close_timebox(logged_in_client, random_data, models):
 	for task in non_done_tasks:
 		assert task['id'] in [t['id'] for t in backlog ]
 
+def test_add_subtask(logged_in_client, sample_data):
+	"""
+	GIVEN a task
+	WHEN add_subtask route is called with valid data
+	THEN subtask appears in that task's subtasks when get tasks is called
+	"""
+	r = logged_in_client.get(f"/get_tasks?project_id={1}")
+	b = r.json
+	t = b['tasks'][0]
+	assert t['subtasks'] == []
+	data = {
+	'project_id': 1,
+	'task_id': t['id'],
+	'title': "I'm a subtask"
+	}
+	r2 = logged_in_client.post('/add_subtask', json=data)
+	r3 = logged_in_client.get(f"/get_tasks?project_id={1}")
+	b3 = r3.json
+	t3 = b3['tasks'][0]
+	assert t3['subtasks'] == [{'id': 1, 'title': "I'm a subtask"}]
+
+
+def test_change_subtask_status(logged_in_client, sample_data):
+	"""
+	GIVEN a task with a subtask
+	WHEN change_subtask_status is called with correct info
+	THEN status of that subtask should be changed
+	"""
+	r = logged_in_client.get(f"/get_tasks?project_id={1}")
+	b = r.json
+	t = b['tasks'][0]
+	assert t['subtasks'] == [{'id':2, 'title': 'test subtask 1', 'status': 'To Do'}]
+
+
 
 
 
