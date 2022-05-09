@@ -13,7 +13,8 @@ def add_tasks_to_response(all_tasks, timeboxes, resp):
                         'priority': task.priority,
                         'theme':task.theme.title,
                         'timebox': task.timebox.title,
-                        'theme_color': task.theme.color
+                        'theme_color': task.theme.color,
+                        'subtasks': [{'id': st.id, 'title': st.title, 'status': st.status} for st in task.subtasks.all()]
                         })
 
 def add_themes_to_response(themes, resp):

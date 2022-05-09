@@ -19,7 +19,7 @@ def test_new_task(project):
 	t = Task(title='Test Task', project=project)
 	assert t.title == 'Test Task'
 	assert t.project == project
-	assert t.subtasks.all == []
+	assert t.subtasks.all() == []
 	assert t in project.tasks
 
 def test_new_theme(project):
@@ -100,42 +100,43 @@ def test_timebox_change_status_to_closed(random_data):
 	for task in non_done_tasks:
 		assert task in backlog.tasks.all()
 
-def test_create_subtask():
+def test_create_subtask(project):
 	"""
 	GIVEN a task
 	WHEN add subtask method of that task is called
 	THEN subtask should be in the subtasks of that task
 	"""
-	t = Task(title='new task')
-	t.add_sub_task("I'm a subtask of the new task")
+	t = Task(title='new task', project=project)
+	t.add_subtask("I'm a subtask of the new task")
 	assert len(t.subtasks.all()) == 1
 	st = t.subtasks.first()
 	assert st.title == "I'm a subtask of the new task"
 	assert st.status == 'To Do'
 
-def test_delete_subtask():
+def test_delete_subtask(project):
 	"""
 	GIVEN a task with a subtask
 	WHEN delete subtask method is called
 	THEN subtask should be deleted
 	"""
-	t = Task(title='new task')
-	t.add_sub_task("I'm a subtask of the new task")
+	t = Task(title='new task', project=project)
+	t.add_subtask("I'm a subtask of the new task")
 	assert len(t.subtasks.all()) == 1
 	st = t.subtasks.first()
 	stid = st.id
+	print('st=',st)
 	t.delete_subtask(st)
 	assert len(t.subtasks.all()) == 0
 	assert Subtask.query.get(stid) == None
 
-def test_change_subtask_status():
+def test_change_subtask_status(project):
 	"""
 	GIVEN a task with a subtask
 	WHEN the change_status method of that subtask is called
 	THEN subtask's status should be changed to the target status
 	"""
-	t = Task(title='new task')
-	t.add_sub_task("I'm a subtask of the new task")
+	t = Task(title='new task', project=project)
+	t.add_subtask("I'm a subtask of the new task")
 	st = t.subtasks.first()
 	assert st.status == 'To Do'
 	st.change_status('In Progress')
@@ -145,27 +146,27 @@ def test_change_subtask_status():
 	st.change_status('To Do')
 	assert st.status == 'To Do'
 
-def test_first_subtask_in_progress():
+def test_first_subtask_in_progress(project):
 	"""
 	GIVEN a task with subtasks
 	WHEN the first subtask changes status to in progress
 	THEN the status of the parent task is changed to in progress
 	"""
-	t = Task(title='new task')
-	t.add_sub_task("I'm a subtask of the new task")
+	t = Task(title='new task', project=project, status='To Do')
+	t.add_subtask("I'm a subtask of the new task")
 	st = t.subtasks.first()
 	assert t.status == 'To Do'
 	st.change_status('In Progress')
 	assert st.status == 'In Progress'
-	assert t.status == 'To Progress'
+	assert t.status == 'In Progress'
 
-def test_last_subtask_done():
-	t = Task(title='new task')
+def test_last_subtask_done(project):
+	t = Task(title='new task', project=project, status='To Do')
 	for i in range(3):
-		t.add_sub_task(f"I'm subtask number {i} of the new task")
-	for st in task.subtasks.all():
+		t.add_subtask(f"I'm subtask number {i} of the new task")
+	for st in t.subtasks.all():
 		st.change_status('Done')
-		if set(subtask.status for subtask in t.tasks.all()) != {'Done'}:
+		if set(subtask.status for subtask in t.subtasks.all()) != {'Done'}:
 			assert t.status == 'In Progress'
 		else:
 			assert t.status == 'Done'

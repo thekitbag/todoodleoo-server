@@ -46,8 +46,14 @@ def update_timebox_status():
     if data['status'] not in ['To Do', 'In Progress', 'Closed']:
         return 'Invalid status', 400
 
+    project = Project.query.get(data['project_id'])
     timebox = Timebox.query.get(data['timebox_id'])
-    timebox.change_status(data['status'])
+
+    if project and timebox:
+        timebox.change_status(data['status'])
+
+    else: return 'project or timebox not found', 404
+    
     return f'Timebox status changed to to {data["status"]}', 200
 
 @bp.route('/timebox_shortcuts', methods=['POST'])

@@ -64,6 +64,7 @@ def test_get_tasks_existing_data(sample_data, test_client):
 	assert tasks[0] == {'id': 1,
 	'priority': 0,
 	'status': 'To Do',
+	'subtasks': [],
 	'theme': 'No Theme',
 	'theme_color': None,
 	'timebox': 'Backlog',
@@ -328,17 +329,21 @@ def test_add_subtask(logged_in_client, sample_data):
 	r = logged_in_client.get(f"/get_tasks?project_id={1}")
 	b = r.json
 	t = b['tasks'][0]
+	print('t=', t)
 	assert t['subtasks'] == []
+
 	data = {
 	'project_id': 1,
 	'task_id': t['id'],
 	'title': "I'm a subtask"
 	}
 	r2 = logged_in_client.post('/add_subtask', json=data)
+	assert r2.status_code == 200
 	r3 = logged_in_client.get(f"/get_tasks?project_id={1}")
 	b3 = r3.json
 	t3 = b3['tasks'][0]
-	assert t3['subtasks'] == [{'id': 1, 'title': "I'm a subtask"}]
+	print('t3=',t3)
+	assert t3['subtasks'][0]['title'] == "I'm a subtask"
 
 
 def test_change_subtask_status(logged_in_client, sample_data):
@@ -349,8 +354,8 @@ def test_change_subtask_status(logged_in_client, sample_data):
 	"""
 	r = logged_in_client.get(f"/get_tasks?project_id={1}")
 	b = r.json
-	t = b['tasks'][0]
-	assert t['subtasks'] == [{'id':2, 'title': 'test subtask 1', 'status': 'To Do'}]
+	t = b['tasks'][1]
+	assert t['subtasks'] == [{'id':1, 'title': 'test subtask 1', 'status': 'To Do'}]
 
 
 

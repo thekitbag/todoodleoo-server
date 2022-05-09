@@ -301,10 +301,52 @@ def test_edit_timebox_incorrect_project_id(logged_in_client, sample_data):
 	assert r.status_code == 401
 
 def test_close_timebox_missing_data(logged_in_client, sample_data):
-	assert 0 == 1
+	"""
+	GIVEN a project with timeboxes
+	WHEN close timebox is called with missing data
+	THEN a 400 is returned
+	"""
+
+	data = {
+	'timebox_id': 1,
+	'status': 'Closed'
+	}
+
+	r2 = logged_in_client.post('/update_timebox_status', json=data)
+	assert r2.status_code == 400
 
 def test_close_timebox_incorrect_project_id(logged_in_client, sample_data):
-	assert 0 == 1
+	"""
+	GIVEN a project with timeboxes
+	WHEN close timebox is called with a project ID that doesnt exist
+	THEN a 404 is returned
+	"""
+
+	data = {
+	'project_id': 9999,
+	'timebox_id': 1,
+	'status': 'Closed'
+	}
+
+	r2 = logged_in_client.post('/update_timebox_status', json=data)
+	assert r2.status_code == 404
 
 def test_add_subtask_missing_data(logged_in_client, sample_data):
-	assert 0 == 1
+	"""
+	GIVEN a project with tasks
+	WHEN add subtask is called with no project_id or task_id
+	THEN return a 400
+	"""
+	data = {
+	'task_id': 1,
+	'title': "I'm a subtask"
+	}
+	r = logged_in_client.post('/add_subtask', json=data)
+	assert r.status_code == 400
+
+	data = {
+	'project_id': 1,
+	'title': "I'm a subtask"
+	}
+	r2 = logged_in_client.post('/add_subtask', json=data)
+	assert r2.status_code == 400

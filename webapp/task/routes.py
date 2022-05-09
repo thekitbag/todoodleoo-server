@@ -143,3 +143,22 @@ def edit_task():
     task.edit_task(title, priority, theme)
 
     return 'success', 200
+
+@bp.route('/add_subtask', methods=['POST'])
+def add_subtask():
+    data=json.loads(request.data.decode('utf-8'))
+
+    if 'project_id' not in data:
+        return 'No project ID in request', 400
+    if 'task_id' not in data:
+        return 'No task ID in request', 400
+    if 'title' not in data:
+        return 'No subtask title in request', 400
+
+    project_id = data['project_id']
+    task = Task.query.get(data['task_id'])
+    title = data['title']
+
+    task.add_subtask(title)
+
+    return 'Subtask added', 200

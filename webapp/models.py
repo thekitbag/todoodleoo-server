@@ -40,6 +40,23 @@ class StatusUpdate(db.Model):
 
 class Subtask(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(128))
+    task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
+    status = db.Column(db.String(32), index=True)
+
+    def change_status(self, target_status):
+        parent_task = self.task
+        subtask_statuses = set([st.status for st in parent_task.subtasks.all()])
+        if subtask_statuses == {'To Do'}: #if this subtask in the first one to change to in progress
+            parent_task.status = 'In Progress'
+            self.status = target_status
+        else:
+            self.status = target_status
+            subtask_statuses = set([st.status for st in parent_task.subtasks.all()])
+            if subtask_statuses == {'Done'}: #if all subtasks are now done
+                parent_task.status = 'Done'
+        db.session.add(self)
+        db.session.commit()
 
     def __repr__(self):
         return f'<Subtask {self.id}>'
@@ -54,6 +71,8 @@ class Task(db.Model):
     updates = db.relationship('StatusUpdate', backref='task', lazy='dynamic')
     timebox_id = db.Column(db.Integer, db.ForeignKey('timebox.id'))
     priority = db.Column(db.Integer)
+    subtasks = db.relationship('Subtask', backref='task', lazy='dynamic')
+
 
     def add(self, project):
         self.priority = 0
@@ -74,6 +93,12 @@ class Task(db.Model):
 
     def delete(self):
         db.session.delete(self)
+        db.session.commit()
+
+    def delete_subtask(self, subtask):
+        self.subtasks.remove(subtask)
+        db.session.add(self)
+        db.session.delete(subtask)
         db.session.commit()
 
     def update_task(self, project_id, timebox, priority):
@@ -98,6 +123,12 @@ class Task(db.Model):
         self.title = title
         self.priority = priority
         self.theme = theme
+        db.session.add(self)
+        db.session.commit()
+
+    def add_subtask(self, title):
+        subtask = Subtask(title=title, status='To Do')
+        self.subtasks.append(subtask)
         db.session.add(self)
         db.session.commit()
 
