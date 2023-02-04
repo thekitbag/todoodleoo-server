@@ -6,10 +6,10 @@ from flask_login import LoginManager
 
 
 
+
 db = SQLAlchemy()
 migrate = Migrate(db)
 login = LoginManager()
-
 
 
 import webapp.main.routes

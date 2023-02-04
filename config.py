@@ -19,5 +19,8 @@ class StagingConfig(Config):
     #SESSION_COOKIE_DOMAIN = 'https://www.google.com'
 
 class DevelopmentConfig(Config):
-    APPLICATION_ROOT = '/'
+    APPLICATION_ROOT = '/api'
     SECRET_KEY = 'supersecurepw'
+
+class ProductionConfig(Config):
+    APPLICATION_ROOT = '/api'
