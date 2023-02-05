@@ -14,12 +14,12 @@ def add_timebox():
 
     project = Project.query.get(data['project_id'])
     title=data['title']
-    goals=[goal for goal in data['goals'] if goal != None]
+    goal=data['goal']
     timebox = Timebox(title=title, project=project, status='To Do')
-    timebox.add_goals(goals)
+    timebox.add_goal(goal)
     db.session.add(timebox)
     db.session.commit()
-    return {'id': timebox.id, 'title': timebox.title, 'start_time': timebox.start_time, 'end-time': timebox.end_time, 'goals': [g.title for g in timebox.goals.all()]}
+    return {'id': timebox.id, 'title': timebox.title, 'start_time': timebox.start_time, 'end-time': timebox.end_time, 'goal': goal}
 
 @bp.route('/delete_timebox', methods=['POST'])
 def delete_timebox():

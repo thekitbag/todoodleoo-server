@@ -153,13 +153,12 @@ class Timebox(db.Model):
     end_time = db.Column(db.DateTime, default=datetime.today() + timedelta(hours=8))
     status = db.Column(db.String(32))
     tasks = db.relationship('Task', backref='timebox', lazy='dynamic')
-    goals = db.relationship('Goal', backref='timebox', lazy='dynamic')
+    goal = db.Column(db.String(128))
 
-    def add_goals(self, goals):
-        for goal in goals:
-            g = Goal(title=goal)
-            db.session.add(g)
-            self.goals.append(g)
+    def add_goal(self, goal):
+        g = Goal(title=goal)
+        db.session.add(g)
+        self.goal = goal
         db.session.add(self)
         db.session.commit()
 

@@ -22,9 +22,14 @@ def add_themes_to_response(themes, resp):
                         for theme in themes if theme.title != 'No Theme']
 
 def add_timeboxes_to_response(timeboxes, resp):
-    resp['timeboxes'] = [{'id': timebox.id,
-                        'title': timebox.title,
-                        'goals': [goal.title for goal in timebox.goals.all() if len(goal.title) > 1],
-                        'start_time': timebox.start_time,
-                        'end-time': timebox.end_time,
-                        'status': timebox.status} for timebox in timeboxes]
+    timeboxes_data = []
+    for timebox in timeboxes:
+        timebox_data = {'id': timebox.id,
+            'title': timebox.title,
+            'start_time': timebox.start_time,
+            'end-time': timebox.end_time,
+            'status': timebox.status}
+        if timebox.goal:
+            timebox_data['goal'] = timebox.goal
+        timeboxes_data.append(timebox_data)
+    resp['timeboxes'] = timeboxes_data
