@@ -9,6 +9,10 @@ from webapp.main.helpers import insert_task_at_priority, prioritise_tasks
 def load_user(id):
     return User.query.get(int(id))
 
+user_project = db.Table('user_project',
+	db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+	db.Column('project_id', db.Integer, db.ForeignKey('project.id'))
+)
 class Goal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128))
@@ -19,11 +23,12 @@ class Goal(db.Model):
 
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    #user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     title = db.Column(db.String(32))
     tasks = db.relationship('Task', backref='project', lazy='dynamic')
     themes = db.relationship('Theme', backref='project', lazy='dynamic')
     timeboxes = db.relationship('Timebox', backref='project', lazy='dynamic')
+    users = db.relationship('User', secondary=user_project, back_populates='projects')
 
     def __repr__(self):
         return f'<Project {self.id}  {self.title}>'
@@ -195,10 +200,24 @@ class User(UserMixin, db.Model):
     password = db.Column(db.Text)
     roles = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True, server_default='true')
-    projects = db.relationship('Project', backref='user', lazy='dynamic')
+    projects = db.relationship('Project', secondary=user_project, back_populates='users')
+
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
+    
+    def add_project(self, title):
+        p = Project(title=title)
+        tb1 = Timebox(title='Backlog', project=p, status='To Do')
+        th1 = Theme(title='No Theme', project=p)
+        self.projects.append(p)
+        db.session.commit()
+
+    
+    def add_to_project(self, user, project):
+        #this needs to be invite not add, but one step at a time
+        project.users.append(user)
+

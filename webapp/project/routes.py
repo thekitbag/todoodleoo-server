@@ -16,14 +16,10 @@ def add_project():
     if title == None or title == '':
         return 'No title', 400
 
-    project = Project(title=title, user=current_user)
-    tb1 = Timebox(title='Backlog', project=project, status='To Do')
-    th1 = Theme(title='No Theme', project=project)
+    project = Project(title=title)
+    current_user.add_project(title=title)
 
-    db.session.add_all([project, tb1, th1])
-    db.session.commit()
-
-    projects = current_user.projects.all()
+    projects = current_user.projects
     resp = {}
     resp['projects'] = [{'project_id': project.id, 'project_title': project.title} for project in projects]
     return jsonify(resp)
@@ -32,7 +28,7 @@ def add_project():
 @bp.route('/get_projects', methods=['GET'])
 def get_projects():
     if current_user.is_authenticated:
-        projects = current_user.projects.all()
+        projects = current_user.projects
         resp = {}
         resp['projects'] = [{'project_id': project.id, 'project_title': project.title} for project in projects]
         return resp

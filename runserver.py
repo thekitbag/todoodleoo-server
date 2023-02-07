@@ -1,6 +1,6 @@
 import os
 from webapp import create_app, db
-from webapp.models import Task, StatusUpdate, Theme, Timebox, Project
+from webapp.models import Task, StatusUpdate, Theme, Timebox, Project, User
 from config import Config, TestConfig, StagingConfig, DevelopmentConfig, ProductionConfig
 from dotenv import load_dotenv
 
@@ -18,4 +18,4 @@ else:
 
 @app.shell_context_processor
 def make_shell_context():
-    return {'db': db, 'Task': Task, 'StatusUpdate': StatusUpdate, 'Theme': Theme, 'Timebox': Timebox, 'Project': Project}
+    return {'db': db, 'Task': Task, 'StatusUpdate': StatusUpdate, 'Theme': Theme, 'Timebox': Timebox, 'Project': Project, 'User': User}
