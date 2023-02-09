@@ -2,7 +2,7 @@ from webapp import db
 from webapp.main import bp
 from flask import json, request, jsonify
 from flask_login import current_user
-from webapp.models import Theme, Timebox, Project
+from webapp.models import Theme, Timebox, Project, User
 from sqlalchemy import func
 
 @bp.route('/add_project', methods=['POST'])
@@ -34,3 +34,33 @@ def get_projects():
         return resp
     else:
         return 'Not Authorised', 401
+
+@bp.route('/share_project', methods=['POST'])
+def share_project():
+
+    if current_user.is_authenticated == False:
+        return 'User not logged in', 401
+
+    data = json.loads(request.data.decode('utf-8'))
+
+    if 'project_id' not in data:
+        return "No Project Id", 400
+    
+    if 'username' not in data:
+        return "No username", 400
+
+    project_id = data['project_id']
+    username = data['username']
+
+    user = User.query.filter_by(username=username).first()
+
+    if user == None:
+        return f"No user found with username: {username}", 404
+    
+    project = Project.query.get(project_id)
+
+    if current_user not in project.users:
+        return f"Cannot share project {project_id} with user {username} because {current_user.username} is not owner"
+
+    current_user.share_project(user, project)
+    return f"Project succesfully shared with {username}", 200

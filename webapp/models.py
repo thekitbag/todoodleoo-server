@@ -217,7 +217,8 @@ class User(UserMixin, db.Model):
         db.session.commit()
 
     
-    def add_to_project(self, user, project):
+    def share_project(self, user, project):
         #this needs to be invite not add, but one step at a time
         project.users.append(user)
+        db.session.commit()
 
