@@ -1,5 +1,8 @@
 from webapp.main.helpers import prioritise_tasks
 
+def add_project_title_to_response(project, resp):
+    resp['project_title'] = project.title
+
 def add_tasks_to_response(all_tasks, timeboxes, resp):
     resp['tasks'] = []
     for tb in timeboxes:

@@ -24,6 +24,7 @@ def get_tasks():
 
     resp = {}
 
+    response_builder.add_project_title_to_response(project, resp)
     response_builder.add_tasks_to_response(all_tasks, timeboxes, resp)
     response_builder.add_themes_to_response(themes, resp)
     response_builder.add_timeboxes_to_response(timeboxes, resp)
