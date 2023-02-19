@@ -4,7 +4,6 @@ from webapp.auth import bp
 from webapp.models import User
 from webapp import db
 
-
 @bp.route('/me', methods=['GET', 'POST'])
 def me():
 	if current_user.is_authenticated:
@@ -13,10 +12,6 @@ def me():
 	else:
 		userdata = {'username': '', 'user_id': -1}
 		return userdata, 200
-
-@bp.route('/test', methods=['GET', 'POST'])
-def test():
-	return {'authenticated:': current_user.is_authenticated}
 
 @bp.route('/login', methods=['POST'])
 def login():
