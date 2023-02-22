@@ -9,6 +9,7 @@ from sqlalchemy import func
 def add_project():
     data = json.loads(request.data.decode('utf-8'))
     title = data['title']
+    project_type = data['project_type']
 
     if current_user.is_authenticated == False:
         return 'User not logged in', 401
@@ -17,11 +18,11 @@ def add_project():
         return 'No title', 400
 
     project = Project(title=title)
-    current_user.add_project(title=title)
+    current_user.add_project(title=title, project_type=project_type)
 
     projects = current_user.projects
     resp = {}
-    resp['projects'] = [{'project_id': project.id, 'project_title': project.title} for project in projects]
+    resp['projects'] = [{'project_id': project.id, 'project_title': project.title, 'project_title': project.title, 'project_type': project.project_type} for project in projects]
     return jsonify(resp)
 
 
@@ -30,7 +31,7 @@ def get_projects():
     if current_user.is_authenticated:
         projects = current_user.projects
         resp = {}
-        resp['projects'] = [{'project_id': project.id, 'project_title': project.title} for project in projects]
+        resp['projects'] = [{'project_id': project.id, 'project_title': project.title, 'project_type': project.project_type} for project in projects]
         return resp
     else:
         return 'Not Authorised', 401

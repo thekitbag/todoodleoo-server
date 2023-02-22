@@ -23,8 +23,8 @@ class Goal(db.Model):
 
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    #user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     title = db.Column(db.String(32))
+    project_type = db.Column(db.String(32))
     tasks = db.relationship('Task', backref='project', lazy='dynamic')
     themes = db.relationship('Theme', backref='project', lazy='dynamic')
     timeboxes = db.relationship('Timebox', backref='project', lazy='dynamic')
@@ -209,8 +209,8 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
     
-    def add_project(self, title):
-        p = Project(title=title)
+    def add_project(self, title, project_type):
+        p = Project(title=title, project_type=project_type)
         tb1 = Timebox(title='Backlog', project=p, status='To Do')
         th1 = Theme(title='No Theme', project=p)
         self.projects.append(p)
