@@ -70,15 +70,15 @@ def test_client(database, app):
 
 @pytest.fixture(scope='function')
 def project(database):
-    p = Project(title='test project')
+    p = Project(title='test project', project_type='board')
     db.session.add(p)
     db.session.commit()
     return p
 
 @pytest.fixture(scope='function')
 def sample_data(database, logged_in_client):
-    logged_in_client.post('add_project', json={'title': 'test  project 1'})
-    logged_in_client.post('add_project', json={'title': 'test  project 2'})
+    logged_in_client.post('add_project', json={'title': 'test  project 1', 'project_type': 'board'})
+    logged_in_client.post('add_project', json={'title': 'test  project 2', 'project_type': 'board'})
 
     p1 = Project.query.filter_by(title='test  project 1').first()
     p2 = Project.query.filter_by(title='test  project 2').first()
@@ -88,8 +88,8 @@ def sample_data(database, logged_in_client):
     logged_in_client.post('/add_theme', json={'project_id': p2.id, 'title': 'test theme 21'})
     logged_in_client.post('/add_theme', json={'project_id': p2.id, 'title': 'test theme 22'})
 
-    logged_in_client.post('add_timebox', json={'project_id': p1.id, 'title': 'To Do This Week', 'goals': []})
-    logged_in_client.post('add_timebox', json={'project_id': p2.id, 'title': 'To Do This Week', 'goals': ['feel good']})
+    logged_in_client.post('add_timebox', json={'project_id': p1.id, 'title': 'To Do This Week', 'goal': []})
+    logged_in_client.post('add_timebox', json={'project_id': p2.id, 'title': 'To Do This Week', 'goal': 'feel good'})
 
     logged_in_client.post('add_task', json={'project_id': p1.id, 'title': 'test task A'})
     logged_in_client.post('add_task', json={'project_id': p1.id, 'title': 'test task B'})

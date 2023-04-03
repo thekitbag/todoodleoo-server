@@ -82,7 +82,7 @@ def edit_timebox():
     if 'title' not in data:
         return 'Request does not contain timebox title', 400
 
-    if 'goals' not in data:
+    if 'goal' not in data:
         return 'Request does not contain any goals', 400
 
     project = Project.query.get(data['project_id'])
@@ -94,11 +94,11 @@ def edit_timebox():
             return 'Timebox and project ID mismatch', 401
 
         title=data['title']
-        goals=[goal for goal in data['goals'] if goal != None]
+        goal=data['goal']
 
         timebox.title = title
         timebox.goals = []
-        timebox.add_goals(goals)
+        timebox.add_goal(goal)
 
         db.session.add(timebox)
         db.session.commit()
@@ -106,6 +106,6 @@ def edit_timebox():
     else:
         return 'Project or timebox not found', 404
 
-    return 'Timebox updted', 200
+    return 'Timebox updated', 200
 
     return data, 200

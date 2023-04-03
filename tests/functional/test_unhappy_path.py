@@ -6,7 +6,7 @@ def test_add_project_no_title(logged_in_client):
 	WHEN add project is called with no title
 	THEN a 400 should be returned
 	"""
-	data = {'title': ''}
+	data = {'title': '', 'project_type': 'board'}
 	r2 = logged_in_client.post('/add_project', json=data)
 	assert r2.status_code == 400
 
@@ -16,7 +16,7 @@ def test_get_tasks_no_project_id(logged_in_client):
 	WHEN the get_tasks route is called for that project with no project Id
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -39,7 +39,7 @@ def test_add_task_no_project_id(logged_in_client):
 	WHEN a task is added with no project Id
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -52,7 +52,7 @@ def add_project_not_logged_in(test_client):
 	WHEN add project is called with valid data
 	THEN a 401 is returned
 	"""
-	data = {'title': 'my new project'}
+	data = {'title': 'my new project', 'project_type': 'board'}
 	r = test_client.post('/add_project', json=data)
 	assert r.status_code == 401
 
@@ -62,7 +62,7 @@ def test_add_task_no_title(logged_in_client):
 	WHEN a task is added with no title
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -75,7 +75,7 @@ def test_add_task_empty_title(logged_in_client):
 	WHEN a task is added with an empty title
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -88,7 +88,7 @@ def test_add_theme_no_project_id(logged_in_client):
 	WHEN a theme is added with no project ID
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -101,7 +101,7 @@ def test_add_theme_no_title(logged_in_client):
 	WHEN a theme is added with no title
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -114,7 +114,7 @@ def test_add_theme_empty_title(logged_in_client):
 	WHEN a theme is added with an empty title
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -126,7 +126,7 @@ def test_add_timebox_no_project_id(logged_in_client):
 	WHEN a timebox is added with no project_id
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -139,7 +139,7 @@ def test_add_timebox_no_title(logged_in_client):
 	WHEN a timebox is added with no title
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -152,7 +152,7 @@ def test_add_timebox_empty_title(logged_in_client):
 	WHEN a timebox is added with an empty title
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -165,11 +165,11 @@ def test_add_task_to_theme_in_different_project(logged_in_client):
 	WHEN update task is called updating the task theme to the theme in the other project
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project 1'}
+	data = {'title': 'test project 1', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id_1 = r_body['projects'][0]['project_id']
-	data2 = {'title': 'test project 2'}
+	data2 = {'title': 'test project 2', 'project_type': 'board'}
 	r2 = logged_in_client.post('/add_project', json=data2)
 	r2_body = r2.json
 	project_id_2 = r2_body['projects'][1]['project_id']
@@ -196,11 +196,11 @@ def test_add_task_to_timebox_in_different_project(logged_in_client):
 	WHEN update task is called updating the task timebox to the timebox in the other project
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project 1'}
+	data = {'title': 'test project 1', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id_1 = r_body['projects'][0]['project_id']
-	data2 = {'title': 'test project 2'}
+	data2 = {'title': 'test project 2', 'project_type': 'board'}
 	r2 = logged_in_client.post('/add_project', json=data2)
 	r2_body = r2.json
 	project_id_2 = r2_body['projects'][1]['project_id']
@@ -211,7 +211,7 @@ def test_add_task_to_timebox_in_different_project(logged_in_client):
 	'title': 'test timebox 1',
 	'start_time': datetime.now(),
 	'end_time': datetime.now() + timedelta(days=1),
-	'goals': []
+	'goal': []
 	}
 	r4 = logged_in_client.post('/add_timebox', json=timebox1_data)
 	timebox2_data = {
@@ -219,7 +219,7 @@ def test_add_task_to_timebox_in_different_project(logged_in_client):
 	'title': 'test timebox 2',
 	'start_time': datetime.now(),
 	'end_time': datetime.now() + timedelta(days=1),
-	'goals': []
+	'goal': []
 	}
 	r5 = logged_in_client.post('/add_timebox', json=timebox1_data)
 	r6 = logged_in_client.post('/add_task', json={'project_id': project_id_1, 'title': 'test task 1'})
@@ -233,7 +233,7 @@ def test_timebox_shortcut_no_project_id(logged_in_client):
 	WHEN a timebox_shortcut is added with no project_id
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -246,7 +246,7 @@ def test_timebox_shortcut_no_timebox_id(logged_in_client):
 	WHEN a timebox_shortcut is added with no timebox_id
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -259,7 +259,7 @@ def test_timebox_shortcut_invalid_shortcut_id(logged_in_client):
 	WHEN a timebox_shortcut is added with no project_id
 	THEN a 400 is returned
 	"""
-	data = {'title': 'test project'}
+	data = {'title': 'test project', 'project_type': 'board'}
 	r = logged_in_client.post('/add_project', json=data)
 	r_body = r.json
 	project_id = r_body['projects'][0]['project_id']
@@ -295,7 +295,7 @@ def test_edit_timebox_incorrect_project_id(logged_in_client, sample_data):
 	'project_id': 2,
 	'timebox_id': 1,
 	'title': 'To do before end of the week',
-	'goals': ['feel better', 'sleep more', 'dont drink']
+	'goal': 'dont drink'
 	}
 	r = logged_in_client.post('/edit_timebox', json=data)
 	assert r.status_code == 401

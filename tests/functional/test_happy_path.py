@@ -23,7 +23,7 @@ def test_add_project(logged_in_client):
 		r = logged_in_client.get('/get_projects')
 		response_body = r.json
 		assert response_body['projects'] == []
-		data = {'title': 'test project'}
+		data = {'title': 'test project', 'project_type': 'board'}
 		r2 = logged_in_client.post('/add_project', json=data)
 		assert r2.status_code == 200
 		r2_body = r2.json
@@ -36,7 +36,7 @@ def test_get_tasks_new_app(logged_in_client):
 	THEN the response is valid, content type is json and all fields are there but empty
 	"""
 	with logged_in_client as c:
-		data = {'title': 'test project'}
+		data = {'title': 'test project', 'project_type': 'board'}
 		r = logged_in_client.post('/add_project', json=data)
 		r_body = r.json
 		project_id = r_body['projects'][0]['project_id']
@@ -116,7 +116,7 @@ def test_add_timebox(test_client, sample_data):
 	'title': 'test timebox abc',
 	'start_time': datetime.now(),
 	'end_time': datetime.now() + timedelta(days=1),
-	'goals': ['do X', 'Do Y']
+	'goal': ['do X']
 	}
 	r = test_client.post('/add_timebox', json=timebox_data)
 	r2 = test_client.get(f'/get_tasks?project_id={1}')
@@ -132,7 +132,7 @@ def test_add_project_existing(sample_data, logged_in_client):
 	r = logged_in_client.get('get_projects')
 	r_body = r.json
 	assert len(r_body['projects']) == 2
-	r2 = logged_in_client.post('add_project', json={'title': 'Shiny New Project'})
+	r2 = logged_in_client.post('add_project', json={'title': 'Shiny New Project', 'project_type': 'board'})
 	r2_body = r2.json
 	assert len(r2_body['projects']) == 3
 	assert r2_body['projects'][2]['project_title'] == 'Shiny New Project'
@@ -267,19 +267,19 @@ def test_edit_timebox(logged_in_client, sample_data):
 	r = logged_in_client.get(f"/get_tasks?project_id={2}")
 	r_body = r.json
 	assert r_body['timeboxes'][1]['title'] == 'To Do This Week'
-	assert r_body['timeboxes'][1]['goals'] == ['feel good']
+	assert r_body['timeboxes'][1]['goal'] == 'feel good'
 	data = {
 	'project_id': 2,
 	'timebox_id': r_body['timeboxes'][1]['id'],
 	'title': 'To do before end of the week',
-	'goals': ['feel better', 'sleep more', 'dont drink']
+	'goal': 'feel better'
 	}
 	r2 = logged_in_client.post('/edit_timebox', json=data)
 	assert r2.status_code == 200
 	r3 = logged_in_client.get(f"/get_tasks?project_id={2}")
 	r3_body = r3.json
 	assert r3_body['timeboxes'][1]['title'] == 'To do before end of the week'
-	assert r3_body['timeboxes'][1]['goals'] == ['feel better', 'sleep more', 'dont drink']
+	assert r3_body['timeboxes'][1]['goal'] == 'feel better'
 
 def test_close_timebox(logged_in_client, random_data, models):
 	"""
@@ -287,6 +287,7 @@ def test_close_timebox(logged_in_client, random_data, models):
 	WHEN close timebox is called
 	THEN timebox status is changed to closed and all non-done tasks are returned to Backlog
 	"""
+	print("random data:", random_data)
 	r = logged_in_client.get(f"/get_tasks?project_id={1}")
 	b = r.json
 	tb = b['timeboxes'][1]

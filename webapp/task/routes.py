@@ -80,9 +80,21 @@ def delete_task():
 
     data = json.loads(request.data.decode('utf-8'))
     task = Task.query.get(data['task_id'])
+    resp = {'tasks': []}
+
+    resp['tasks'].append( {'id': task.id,
+                        'title': task.title,
+                        'status': task.status,
+                        'priority': task.priority,
+                        'theme':task.theme.title,
+                        'timebox': task.timebox.title,
+                        'theme_color': task.theme.color,
+                        'subtasks': [{'id': st.id, 'title': st.title, 'status': st.status} for st in task.subtasks.all()]
+                        })
+
     task.delete()
 
-    return 'Task deleted', 200
+    return resp, 200
 
 
 @bp.route('/update_task', methods=['POST'])
@@ -143,7 +155,19 @@ def edit_task():
 
     task.edit_task(title, priority, theme)
 
-    return 'success', 200
+    resp = {'tasks': []}
+
+    resp['tasks'].append( {'id': task.id,
+                        'title': task.title,
+                        'status': task.status,
+                        'priority': task.priority,
+                        'theme':task.theme.title,
+                        'timebox': task.timebox.title,
+                        'theme_color': task.theme.color,
+                        'subtasks': [{'id': st.id, 'title': st.title, 'status': st.status} for st in task.subtasks.all()]
+                        })
+
+    return resp, 200
 
 @bp.route('/add_subtask', methods=['POST'])
 def add_subtask():
